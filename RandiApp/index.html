@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Egy visszautasíthatatlan ajánlat...</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Megbízhatóbb, alternatív naptár linkek -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <script src="https://cloudflare.com"></script>
+    <script src="https://cloudflare.com"></script>
+</head>
+
+<body>
+
+<div class="card" id="mainCard">
+    <h1>Szia! ✨</h1>
+    <p>Lenne egy nagyon fontos kérdésem hozzád... Eljönnél velem randizni?</p>
+
+    <div class="btn-container">
+        <button id="yesBtn" onclick="chooseFoodPage()">IGEN! 😍</button>
+        <button id="noBtn" onmouseover="escapeButton()" onclick="touchEscape()">Nem 😢</button>
+    </div>
+</div>
+
+<script>
+    const noBtn = document.getElementById('noBtn');
+    const mainCard = document.getElementById('mainCard');
+
+    let valaszok = {
+        etel: '',
+        ital: '',
+        datumIdo: ''
+    };
+
+    function escapeButton() {
+        const x = Math.random() * (window.innerWidth - 150);
+        const y = Math.random() * (window.innerHeight - 100);
+        noBtn.style.position = 'fixed';
+        noBtn.style.left = x + 'px';
+        noBtn.style.top = y + 'px';
+    }
+
+    function touchEscape() {
+        alert("A 'Nem' gomb sajnos elromlott, de az Igen tökéletesen működik! 😉");
+        chooseFoodPage();
+    }
+
+    function chooseFoodPage() {
+        mainCard.innerHTML = `
+            <h1>Szuper! 😍 Micsoda öröm!</h1>
+            <p>Első lépés: Milyen ételt ennél szívesen?</p>
+            <div class="options-grid">
+                <div class="option-card" onclick="saveFood('Pizza 🍕')"><span>🍕</span>Pizza</div>
+                <div class="option-card" onclick="saveFood('Sushi 🍣')"><span>🍣</span>Sushi</div>
+                <div class="option-card" onclick="saveFood('Burger 🍔')"><span>🍔</span>Burger</div>
+                <div class="option-card" onclick="saveFood('Desszert 🍰')"><span>🍰</span>Süti / Desszert</div>
+            </div>
+        `;
+    }
+
+    function saveFood(food) {
+        valaszok.etel = food;
+        chooseDrinkPage();
+    }
+
+    function chooseDrinkPage() {
+        mainCard.innerHTML = `
+            <h1>Koccintsunk is! 🥂</h1>
+            <p>Második lépés: Mit innál hozzá?</p>
+            <div class="options-grid">
+                <div class="option-card" onclick="saveDrink('Bor 🍷')"><span>🍷</span>Finom Bor</div>
+                <div class="option-card" onclick="saveDrink('Koktél 🍹')"><span>🍹</span>Koktél</div>
+                <div class="option-card" onclick="saveDrink('Sör 🍺')"><span>🍺</span>Kézműves Sör</div>
+                <div class="option-card" onclick="saveDrink('Kávé/Tea ☕')"><span>☕</span>Kávé / Tea</div>
+            </div>
+        `;
+    }
+
+    function saveDrink(drink) {
+        valaszok.ital = drink;
+        chooseDatePage();
+    }
+
+
+
+
+        // 3. KÉRDÉS: OKOS IDŐPONT VÁLASZTÓ
+        function chooseDatePage() {
+            mainCard.innerHTML = `
+                <h1>Mikor találkozzunk? 📅</h1>
+                <p>Utolsó lépés: Válaszd ki a legtökéletesebb időpontot!</p>
+
+                <div class="time-container" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+
+                    <div style="text-align: left;">
+                        <label style="display: block; color: #590d22; font-weight: bold; margin-bottom: 5px;">Melyik nap lenne a legjobb?</label>
+                        <!-- Az onchange esemény figyeli, mit választ ki a listából -->
+                        <select id="dateSelect" onchange="toggleCustomDate()" style="width: 100%; padding: 12px; border: 2px solid #ffb3c6; border-radius: 10px; font-size: 1rem; font-weight: bold; color: #590d22; outline: none; background: white; cursor: pointer;">
+                            <option value="Most péntek este 🗓️">Most péntek este 🗓️</option>
+                            <option value="Szombat délután ☀️">Szombat délután ☀️</option>
+                            <option value="Vasárnapi brunch ☕">Vasárnapi kellemes brunch ☕</option>
+                            <option value="egyedi">Amikor neked a legalkalmasabb... ✨</option>
+                        </select>
+                    </div>
+
+                    <!-- Ez a naptár mező alapból rejtve van (display: none) -->
+                    <div id="customDateContainer" style="display: none; text-align: left;">
+                        <label style="display: block; color: #590d22; font-weight: bold; margin-bottom: 5px;">Válaszd ki a pontos napot a naptárból:</label>
+                        <input type="date" id="customDateInput" style="width: 100%; padding: 12px; border: 2px solid #ffb3c6; border-radius: 10px; font-size: 1rem; font-weight: bold; color: #590d22; outline: none; background: white; cursor: pointer;">
+                    </div>
+
+                    <!-- Óra és perc választó -->
+                    <div style="display: flex; gap: 15px;">
+                        <div style="flex: 1; text-align: left;">
+                            <label style="display: block; color: #590d22; font-weight: bold; margin-bottom: 5px;">Hány órakor?</label>
+                            <select id="hourInput" style="width: 100%; padding: 12px; border: 2px solid #ffb3c6; border-radius: 10px; font-size: 1rem; font-weight: bold; color: #590d22; outline: none; background: white; cursor: pointer;">
+                                <option value="16:">16 óra</option>
+                                <option value="17:">17 óra</option>
+                                <option value="18:">18 óra</option>
+                                <option value="19:" selected>19 óra</option>
+                                <option value="20:">20 óra</option>
+                                <option value="21:">21 óra</option>
+                            </select>
+                        </div>
+
+                        <div style="flex: 1; text-align: left;">
+                            <label style="display: block; color: #590d22; font-weight: bold; margin-bottom: 5px;">Perc?</label>
+                            <select id="minuteInput" style="width: 100%; padding: 12px; border: 2px solid #ffb3c6; border-radius: 10px; font-size: 1rem; font-weight: bold; color: #590d22; outline: none; background: white; cursor: pointer;">
+                                <option value="00">00</option>
+                                <option value="15">15</option>
+                                <option value="30" selected>30</option>
+                                <option value="45">45</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button id="submitBtn" onclick="finalizeRandi()">Randi véglegesítése 🚀</button>
+                </div>
+            `;
+
+            // Beállítjuk, hogy a mai napnál korábbi dátumot ne lehessen választani a naptárban
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('customDateInput').min = today;
+        }
+
+        // Ez a függvény mutatja meg vagy rejti el a naptárat a választás alapján
+        function toggleCustomDate() {
+            const selectValue = document.getElementById('dateSelect').value;
+            const customContainer = document.getElementById('customDateContainer');
+
+            if (selectValue === 'egyedi') {
+                customContainer.style.display = 'block'; // Megjelenik a naptár
+            } else {
+                customContainer.style.display = 'none';  // Eltűnik a naptár
+            }
+        }
+
+        // VÉGLEGESÍTÉS ÉS KÜLDÉS
+           function finalizeRandi() {
+            const nap = document.getElementById('dateSelect').value;
+            const ora = document.getElementById('hourInput').value;
+            const perc = document.getElementById('minuteInput').value;
+
+            let veglegesNap = nap;
+            if (nap === 'egyedi') {
+                const egyediDatum = document.getElementById('customDateInput').value;
+                if (!egyediDatum) {
+                    alert("Kérlek, válaszd ki a pontos napot a naptárból! 😊");
+                    return;
+                }
+                veglegesNap = "Egyedi dátum (" + egyediDatum + ")";
+            }
+
+            valaszok.datumIdo = veglegesNap + " " + ora + perc;
+
+            // Csak a saját Java szerverünknek küldjük, ez helyben és felhőben is 100%, hogy működik
+            fetch('/mentes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                },
+                body: `etel=${encodeURIComponent(valaszok.etel)}&ital=${encodeURIComponent(valaszok.ital)}&idopont=${encodeURIComponent(valaszok.datumIdo)}`
+            })
+            .then(response => {
+                if (response.ok) {
+                    mainCard.innerHTML = `
+                        <h1>Szuper! Randi lefoglalva! 🎉💍</h1>
+                        <p>A választásaidat sikeresen továbbítottam a pincérnek (vagyis nekem). 😉</p>
+                        <div style="font-size: 4rem; margin: 20px 0;">❤️ ✨</div>
+                        <p style="font-weight: bold; color: #ff4d6d;">Nagyon várom már! 🥰</p>
+                    `;
+                } else {
+                    alert("Szerver hiba történt a mentés során... 😢");
+                }
+            })
+            .catch(error => {
+                console.error("Hiba:", error);
+                alert("Nem sikerült elérni a Java szervert.");
+            });
+        }
+
+
+</script>
+</body>
+</html>
+
+
+
+</script>
+</body>
+</html>
+
+
