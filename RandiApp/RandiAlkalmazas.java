@@ -11,27 +11,25 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 public class RandiAlkalmazas {
+
+    // 🚨 A TE SAJÁT WEB3FORMS KULCSOD 🚨
     private static final String WEB3FORMS_KEY = "362b4fca-032a-4577-ab3b-a3b1b397796e";
 
-
     public static void main(String[] args) throws IOException {
-        // Elindítjuk a webszervert a 8090-es porton
-        HttpServer server = HttpServer.create(new InetSocketAddress(8090), 0);
+        String portVar = System.getenv("PORT");
+        int port = (portVar != null) ? Integer.parseInt(portVar) : 8090;
 
-        // Útvonalak regisztrálása
+        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+
         server.createContext("/", new KezdoOldalKezelo());
         server.createContext("/style.css", new CssKezelo());
-        server.createContext("/mentes", new RandiMentoKezelo()); // Az új adatfogadó útvonal
+        server.createContext("/mentes", new RandiMentoKezelo());
 
         server.setExecutor(null);
-        System.out.println("==================================================================");
-        System.out.println(" SIKER: A randi szerver elindult!");
-        System.out.println(" Nyisd meg a böngészőben: http://localhost:8090");
-        System.out.println("==================================================================");
+        System.out.println("Szerver elindult a " + port + "-es porton!");
         server.start();
     }
 
-    // HTML betöltése
     static class KezdoOldalKezelo implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
@@ -44,7 +42,7 @@ public class RandiAlkalmazas {
                 os.write(response);
                 os.close();
             } else {
-                String hiba = "Hiba: Az index.html nincs a RandiApp főmappájában! Jelenlegi helye: " + file.getAbsolutePath();
+                String hiba = "Hiba: Az index.html nem talalhato!";
                 exchange.sendResponseHeaders(404, hiba.getBytes().length);
                 OutputStream os = exchange.getResponseBody();
                 os.write(hiba.getBytes());
@@ -53,7 +51,6 @@ public class RandiAlkalmazas {
         }
     }
 
-    // CSS betöltése
     static class CssKezelo implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
@@ -72,17 +69,14 @@ public class RandiAlkalmazas {
         }
     }
 
-    // ÚJ: Ez a rész fogadja a HTML-ből küldött adatokat, és kiírja a konzolra
     static class RandiMentoKezelo implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
-                // Beolvassuk a böngészőből küldött adatokat
                 InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8);
                 BufferedReader br = new BufferedReader(isr);
                 String query = br.readLine();
 
-                // Szétvágjuk és dekódoljuk a kapott szöveget (pl: etel=Pizza&ital=Bor...)
                 String etel = "";
                 String ital = "";
                 String idopont = "";
@@ -98,26 +92,50 @@ public class RandiAlkalmazas {
                     if ("idopont".equals(kulcs)) idopont = ertek;
                 }
 
-                // 🚨 ITT JELENIK MEG NEKED A KONZOLBAN A VÉGEREDMÉNY! 🚨
-                System.out.println("\n==================================================");
-                System.out.println(" ❤️  ÚJ RANDI VÁLASZ ÉRKEZETT! ❤️ ");
-                System.out.println("==================================================");
-                System.out.println(" 🍕 Kiválasztott étel : " + etel);
-                System.out.println(" 🍷 Kiválasztott ital : " + ital);
-                System.out.println(" 📅 Kiválasztott idő  : " + idopont);
-                System.out.println("==================================================\n");
+                System.out.println("\n❤️  RANDI VALASZ ERKEZETT A FELHOBE! ❤️ ");
+                System.out.println(" Etel: " + etel + " | Ital: " + ital + " | Idopont: " + idopont);
 
-                // Válaszolunk a böngészőnek, hogy minden rendben ment
+                // Itt inditjuk el az e-mail kuldest a hatterben
+                kuldEmailErtesitest(etel, ital, idopont);
+
                 String valasz = "OK";
                 exchange.sendResponseHeaders(200, valasz.length());
                 OutputStream os = exchange.getResponseBody();
                 os.write(valasz.getBytes());
                 os.close();
             } else {
-                exchange.sendResponseHeaders(405, 0); // Method Not Allowed
+                exchange.sendResponseHeaders(405, 0);
                 exchange.getResponseBody().close();
             }
         }
+
+        // Felhőbiztos HTTPS e-mail küldő modul
+        private void kuldEmailErtesitest(String etel, String ital, String idopont) {
+            new Thread(() -> {
+                try {
+                    String uzenet = "Szia!\n\nUj randi meghivas lett elfogadva!\n\n" +
+                            "Etel: " + etel + "\n" +
+                            "Ital: " + ital + "\n" +
+                            "Idopont: " + idopont;
+
+                    String postData = "access_key=" + WEB3FORMS_KEY +
+                            "&subject=" + java.net.URLEncoder.encode("Uj Randi Foglalas! ❤️", "UTF-8") +
+                            "&message=" + java.net.URLEncoder.encode(uzenet, "UTF-8");
+
+                    java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+                    java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                            .uri(java.net.URI.create("https://web3forms.com"))
+                            .header("Content-Type", "application/x-www-form-urlencoded")
+                            .POST(java.net.http.HttpRequest.BodyPublishers.ofString(postData))
+                            .build();
+
+                    java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+                    System.out.println("E-mail szerver valasza a felhoben: " + response.body());
+
+                } catch (Exception e) {
+                    System.out.println("Hiba tortent az e-mail kuldese kozben: " + e.getMessage());
+                }
+            }).start();
+        }
     }
 }
-
