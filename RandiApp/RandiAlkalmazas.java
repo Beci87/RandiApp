@@ -110,6 +110,7 @@ public class RandiAlkalmazas {
         }
 
         // Felhőbiztos HTTPS e-mail küldő modul
+        // VÉGLEGES ÉS SPAMSZŰRŐ-BIZTOS E-MAIL KÜLDŐ
         private void kuldEmailErtesitest(String etel, String ital, String idopont) {
             new Thread(() -> {
                 try {
@@ -118,13 +119,16 @@ public class RandiAlkalmazas {
                             "Ital: " + ital + "\n" +
                             "Idopont: " + idopont;
 
+                    // Hozzáadtuk a name és email mezőket, hogy a Web3Forms spamszűrője átengedje!
                     String postData = "access_key=" + WEB3FORMS_KEY +
+                            "&name=" + java.net.URLEncoder.encode("Randi Partner 😍", "UTF-8") +
+                            "&email=" + java.net.URLEncoder.encode("randiapp@felho.hu", "UTF-8") +
                             "&subject=" + java.net.URLEncoder.encode("Uj Randi Foglalas! ❤️", "UTF-8") +
                             "&message=" + java.net.URLEncoder.encode(uzenet, "UTF-8");
 
                     java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
                     java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
-                            .uri(java.net.URI.create("https://web3forms.com"))
+                            .uri(java.net.URI.create("https://api.web3forms.com/submit"))
                             .header("Content-Type", "application/x-www-form-urlencoded")
                             .POST(java.net.http.HttpRequest.BodyPublishers.ofString(postData))
                             .build();
@@ -137,5 +141,6 @@ public class RandiAlkalmazas {
                 }
             }).start();
         }
+
     }
 }
