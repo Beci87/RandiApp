@@ -13,7 +13,7 @@ import java.nio.file.Files;
 public class RandiAlkalmazas {
 
     // 🚨 A TE SAJÁT WEB3FORMS KULCSOD 🚨
-    private static final String WEB3FORMS_KEY = "362b4fca-032a-4577-ab3b-a3b1b397796e";
+    private static final String WEB3FORMS_KEY = "09be82c4-9d04-4e0d-b733-af3dd910c16b";
 
     public static void main(String[] args) throws IOException {
         String portVar = System.getenv("PORT");
