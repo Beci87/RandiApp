@@ -25,19 +25,20 @@
     let valaszok = {
         etel: '',
         ital: '',
-        datumIdo: ''
+        datumIdo: '',
+        nyersDatum: null
     };
 
-    // Helyszínek és pontos Google Térkép linkek
- const helyszinek = {
-        "Pizza 🍕": { nev: "La Terrazza étterem", kereses: "La Terrazza étterem Nyíregyháza" },
-        "Sushi 🍣": { nev: "Wok'n Go", kereses: "Wok n Go Nyíregyháza" },
-        "Burger 🍔": { nev: "Simon's Burger (Pláza/Korzó)", kereses: "Simons Burger Nyíregyháza" },
-        "Desszert 🍰": { nev: "Stühmer cukrászda", kereses: "Stühmer Cukrászda Nyíregyháza" },
-        "Bor 🍷": { nev: "Continent Wine&Cafe", kereses: "Continent Wine and Coffee Nyíregyháza" },
-        "Koktél 🍹": { nev: "Hedonist étterem", kereses: "Hedonist Restaurant Nyíregyháza" },
-        "Sör 🍺": { nev: "Gedeon söröző", kereses: "Gedeon Nyíregyháza" },
-        "Kávé/Tea ☕": { nev: "Cafe Frei", kereses: "Cafe Frei Nyíregyháza" }
+    // Helyszínek, keresési linkek és öltözködési tippek
+    const helyszinek = {
+        "Pizza 🍕": { nev: "La Terrazza étterem", kereses: "La Terrazza étterem Nyíregyháza", dressCode: "Laza, csinos outfit 🍕✨" },
+        "Sushi 🍣": { nev: "Wok'n Go", kereses: "Wok n Go Nyíregyháza", dressCode: "Kényelmes, de stílusos viselet 🥢" },
+        "Burger 🍔": { nev: "Simon's Burger (Pláza/Korzó)", kereses: "Simons Burger Nyíregyháza", dressCode: "Teljesen laza, vagány szett 🍔" },
+        "Desszert 🍰": { nev: "Stühmer cukrászda", kereses: "Stühmer Cukrászda Nyíregyháza", dressCode: "Elegáns-laza, sütizős hangulat ☕🍰" },
+        "Bor 🍷": { nev: "Continent Wine&Cafe", kereses: "Continent Wine and Coffee Nyíregyháza", dressCode: "Kissé elegánsabb, hangulatos esti szett 🍷" },
+        "Koktél 🍹": { nev: "Hedonist étterem", kereses: "Hedonist Restaurant Nyíregyháza", dressCode: "Csinos, kiöltözős koktélos outfit 🍹✨" },
+        "Sör 🍺": { nev: "Gedeon söröző", kereses: "Gedeon Nyíregyháza", dressCode: "Kötetlen, kényelmes viselet 🍺" },
+        "Kávé/Tea ☕": { nev: "Cafe Frei", kereses: "Cafe Frei Nyíregyháza", dressCode: "Kellemes, délutáni laza szett ☕" }
     };
 
     function escapeButton() {
@@ -53,7 +54,6 @@
         chooseFoodPage();
     }
 
-    // 1. KÉRDÉS: ÉTEL VÁLASZTÁS
     function chooseFoodPage() {
         mainCard.innerHTML = "<h1>Szuper! 😍 Micsoda öröm!</h1>" +
             "<p>Első lépés: Milyen ételt ennél szívesen?</p>" +
@@ -71,7 +71,6 @@
         chooseDrinkPage();
     }
 
-    // 2. KÉRDÉS: ITAL VÁLASZTÁS
     function chooseDrinkPage() {
         mainCard.innerHTML = "<h1>Koccintsunk is! 🥂</h1>" +
             "<p>Második lépés: Mit innál szívesen?</p>" +
@@ -88,7 +87,6 @@
         chooseDatePage();
     }
 
-    // 3. KÉRDÉS: IDŐPONT
     function chooseDatePage() {
         mainCard.innerHTML = "<h1>Mikor találkozzunk? 📅</h1>" +
             "<p>Utolsó lépés: Válaszd ki a legtökéletesebb időpontot!</p>" +
@@ -110,12 +108,12 @@
                     "<div style='flex: 1; text-align: left;'>" +
                         "<label style='display: block; color: #590d22; font-weight: bold; margin-bottom: 5px;'>Hány órakor?</label>" +
                         "<select id='hourInput' style='width: 100%; padding: 12px; border: 2px solid #ffb3c6; border-radius: 10px; font-size: 1rem; font-weight: bold; color: #590d22; outline: none; background: white; cursor: pointer;'>" +
-                            "<option value='16:'>16 óra</option>" +
-                            "<option value='17:'>17 óra</option>" +
-                            "<option value='18:'>18 óra</option>" +
-                            "<option value='19:' selected>19 óra</option>" +
-                            "<option value='20:'>20 óra</option>" +
-                            "<option value='21:'>21 óra</option>" +
+                            "<option value='16'>16 óra</option>" +
+                            "<option value='17'>17 óra</option>" +
+                            "<option value='18'>18 óra</option>" +
+                            "<option value='19' selected>19 óra</option>" +
+                            "<option value='20'>20 óra</option>" +
+                            "<option value='21'>21 óra</option>" +
                         "</select>" +
                     "</div>" +
                     "<div style='flex: 1; text-align: left;'>" +
@@ -145,46 +143,80 @@
         }
     }
 
-    // VÉGSŐ LOGIKA ÉS KÜLDÉS
-function finalizeRandi() {
-        const nap = document.getElementById('dateSelect').value;
+    function finalizeRandi() {
+        const btn = document.getElementById('submitBtn');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = "Foglalás folyamatban... ⏳";
+            btn.style.opacity = "0.6";
+            btn.style.cursor = "not-allowed";
+        }
+
+        const napSelect = document.getElementById('dateSelect').value;
         const ora = document.getElementById('hourInput').value;
         const perc = document.getElementById('minuteInput').value;
 
-        let veglegesNap = nap;
-        if (nap === 'egyedi') {
+        let targetDate = new Date();
+        let veglegesNapText = napSelect;
+
+        if (napSelect === 'egyedi') {
             const egyediDatum = document.getElementById('customDateInput').value;
             if (!egyediDatum) {
                 alert("Kérlek, válaszd ki a pontos napot a naptárból! 😊");
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = "Randi véglegesítése 🚀";
+                    btn.style.opacity = "1";
+                    btn.style.cursor = "pointer";
+                }
                 return;
             }
-            veglegesNap = "Egyedi dátum (" + egyediDatum + ")";
+            veglegesNapText = "Egyedi dátum (" + egyediDatum + ")";
+            const parts = egyediDatum.split('-');
+            targetDate = new Date(parts[0], parts[1] - 1, parts[2], parseInt(ora), parseInt(perc));
+        } else {
+            // Fix opciók esetén kiszámítjuk a céldátumot
+            let now = new Date();
+            let dayOffset = 0;
+            if (napSelect.includes("péntek")) {
+                dayOffset = (5 - now.getDay() + 7) % 7;
+            } else if (napSelect.includes("Szombat")) {
+                dayOffset = (6 - now.getDay() + 7) % 7;
+            } else if (napSelect.includes("Vasárnap")) {
+                dayOffset = (0 - now.getDay() + 7) % 7;
+            }
+            targetDate.setDate(now.getDate() + dayOffset);
+            targetDate.setHours(parseInt(ora), parseInt(perc), 0, 0);
         }
 
-        valaszok.datumIdo = veglegesNap + " " + ora + perc;
+        valaszok.nyersDatum = targetDate;
+        valaszok.datumIdo = veglegesNapText + " " + ora + ":" + perc;
 
         let veglegesHelyszin = "";
         let keresoKifejezes = "";
+        let ajanlottDressCode = "";
 
-        // Helyszín kiválasztása
         if (valaszok.etel && valaszok.etel !== "Csak inni szeretnék 🥂" && helyszinek[valaszok.etel]) {
             veglegesHelyszin = helyszinek[valaszok.etel].nev;
             keresoKifejezes = helyszinek[valaszok.etel].kereses;
+            ajanlottDressCode = helyszinek[valaszok.etel].dressCode;
         } else if (valaszok.ital && helyszinek[valaszok.ital]) {
             veglegesHelyszin = helyszinek[valaszok.ital].nev;
             keresoKifejezes = helyszinek[valaszok.ital].kereses;
+            ajanlottDressCode = helyszinek[valaszok.ital].dressCode;
         } else {
             veglegesHelyszin = "Belvárosi találkozó pont";
             keresoKifejezes = "Nyíregyháza Kossuth tér";
+            ajanlottDressCode = "Kényelmes, városi szett ✨";
         }
 
-        const terkepLink = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(keresoKifejezes);
+        const terkepLink = "[https://www.google.com/maps/search/?api=1&query=](https://www.google.com/maps/search/?api=1&query=)" + encodeURIComponent(keresoKifejezes);
 
-        // HOZZÁADVA: &helyszin= paraméter a kéréshez
         const kuldesiBody = "etel=" + encodeURIComponent(valaszok.etel) +
                            "&ital=" + encodeURIComponent(valaszok.ital) +
                            "&idopont=" + encodeURIComponent(valaszok.datumIdo) +
-                           "&helyszin=" + encodeURIComponent(veglegesHelyszin);
+                           "&helyszin=" + encodeURIComponent(veglegesHelyszin) +
+                           "&dressCode=" + encodeURIComponent(ajanlottDressCode);
 
         fetch('/mentes', {
             method: 'POST',
@@ -196,20 +228,69 @@ function finalizeRandi() {
                 mainCard.innerHTML = "<h1>Szuper! Randi lefoglalva! 🎉</h1>" +
                     "<p>Mindent elintéztem, a megbeszélt időpont:</p>" +
                     "<p style='font-weight: bold; color: #ff4d6d; font-size: 1.1rem; margin: 10px 0;'>" + valaszok.datumIdo + "</p>" +
-                    "<p>A találkozó helyszíne:</p>" +
+
+                    "<div id='countdownBox' style='background: #fff0f3; border: 2px dashed #ff4d6d; padding: 12px; border-radius: 12px; margin: 15px 0;'>" +
+                        "<p style='margin: 0; font-size: 0.9rem; color: #590d22;'>Már csak ennyi van hátra:</p>" +
+                        "<p id='timer' style='font-size: 1.2rem; font-weight: bold; color: #ff4d6d; margin: 5px 0;'>Számolás...</p>" +
+                    "</div>" +
+
+                    "<p style='margin-bottom: 2px;'>A találkozó helyszíne:</p>" +
                     "<p style='font-weight: bold; color: #590d22; font-size: 1.2rem; margin: 5px 0;'>✨ " + veglegesHelyszin + " ✨</p>" +
-                    "<a href='" + terkepLink + "' target='_blank' style='display: inline-block; background-color: #38b000; color: white; padding: 12px 25px; font-weight: bold; text-decoration: none; border-radius: 25px; margin: 20px 0; box-shadow: 0 4px 15px rgba(56, 176, 0, 0.3);'>" +
+
+                    "<p style='font-size: 0.9rem; color: #7a1f3d; background: #f8f9fa; padding: 8px; border-radius: 8px; margin: 10px 0;'>" +
+                        "👗 <b>Öltözködési tipp:</b> " + ajanlottDressCode +
+                    "</p>" +
+
+                    "<a href='" + terkepLink + "' target='_blank' style='display: inline-block; background-color: #38b000; color: white; padding: 12px 25px; font-weight: bold; text-decoration: none; border-radius: 25px; margin: 15px 0; box-shadow: 0 4px 15px rgba(56, 176, 0, 0.3);'>" +
                         "Útvonalterv megnyitása 🗺️" +
                     "</a>" +
                     "<p style='font-style: italic; color: #7a1f3d;'>Nagyon várom már! 🥰</p>";
+
+                inditVisszaszamlalot(valaszok.nyersDatum);
             } else {
                 alert("Szerver hiba történt a mentés során... 😢");
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = "Randi véglegesítése 🚀";
+                    btn.style.opacity = "1";
+                    btn.style.cursor = "pointer";
+                }
             }
         })
         .catch(error => {
             console.error("Hiba:", error);
             alert("Nem sikerült elérni a Java szervert.");
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "Randi véglegesítése 🚀";
+                btn.style.opacity = "1";
+                btn.style.cursor = "pointer";
+            }
         });
+    }
+
+    function inditVisszaszamlalot(targetDate) {
+        function frissitTimer() {
+            const now = new Date().getTime();
+            const distance = targetDate.getTime() - now;
+
+            if (distance < 0) {
+                document.getElementById("timer").innerHTML = "Itt az idő! 🎉😍";
+                return;
+            }
+
+            const napok = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const orak = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const percek = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const masodpercek = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("timer").innerHTML =
+                (napok > 0 ? napok + " nap " : "") +
+                orak + " óra " + percek + " perc " + masodpercek + " mp";
+        }
+
+        frissitTimer();
+        setInterval(frissitTimer, 1000);
     }
 </script>
 </body>

@@ -12,7 +12,6 @@ import java.nio.file.Files;
 
 public class RandiAlkalmazas {
 
-    // 🚨 A TE SAJÁT WEB3FORMS KULCSOD 🚨
     private static final String WEB3FORMS_KEY = "362b4fca-032a-4577-ab3b-a3b1b397796e";
 
     public static void main(String[] args) throws IOException {
@@ -95,7 +94,8 @@ public class RandiAlkalmazas {
                 String etel = "";
                 String ital = "";
                 String idopont = "";
-                String helyszin = ""; // Új változó
+                String helyszin = "";
+                String dressCode = "";
 
                 if (!query.isEmpty()) {
                     String[] pairs = query.split("&");
@@ -107,14 +107,15 @@ public class RandiAlkalmazas {
                         if ("etel".equals(kulcs)) etel = ertek;
                         if ("ital".equals(kulcs)) ital = ertek;
                         if ("idopont".equals(kulcs)) idopont = ertek;
-                        if ("helyszin".equals(kulcs)) helyszin = ertek; // Helyszín beolvasása
+                        if ("helyszin".equals(kulcs)) helyszin = ertek;
+                        if ("dressCode".equals(kulcs)) dressCode = ertek;
                     }
                 }
 
                 System.out.println("\n❤️  RANDI VALASZ ERKEZETT! ❤️");
                 System.out.println(" Etel: " + etel + " | Ital: " + ital + " | Idopont: " + idopont + " | Helyszin: " + helyszin);
 
-                kuldEmailErtesitest(etel, ital, idopont, helyszin);
+                kuldEmailErtesitest(etel, ital, idopont, helyszin, dressCode);
 
                 byte[] valaszBytes = "OK".getBytes(StandardCharsets.UTF_8);
                 exchange.sendResponseHeaders(200, valaszBytes.length);
@@ -127,14 +128,15 @@ public class RandiAlkalmazas {
             }
         }
 
-        private void kuldEmailErtesitest(String etel, String ital, String idopont, String helyszin) {
+        private void kuldEmailErtesitest(String etel, String ital, String idopont, String helyszin, String dressCode) {
             new Thread(() -> {
                 try {
                     String uzenet = "Szia!\n\nUj randi meghivas lett elfogadva!\n\n" +
                             "Etel: " + etel + "\n" +
                             "Ital: " + ital + "\n" +
                             "Idopont: " + idopont + "\n" +
-                            "Helyszin: " + helyszin; // Helyszín az e-mail üzenetben
+                            "Helyszin: " + helyszin + "\n" +
+                            "Dress Code Tipp: " + dressCode;
 
                     String postData = "access_key=" + WEB3FORMS_KEY +
                             "&name=" + java.net.URLEncoder.encode("Randi Partner 😍", StandardCharsets.UTF_8) +
@@ -145,7 +147,7 @@ public class RandiAlkalmazas {
                     java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
 
                     java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
-                            .uri(java.net.URI.create("https://api.web3forms.com/submit"))
+                            .uri(java.net.URI.create("[https://api.web3forms.com/submit](https://api.web3forms.com/submit)"))
                             .header("Content-Type", "application/x-www-form-urlencoded")
                             .POST(java.net.http.HttpRequest.BodyPublishers.ofString(postData))
                             .build();
