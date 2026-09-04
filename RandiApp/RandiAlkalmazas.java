@@ -131,25 +131,28 @@ public class RandiAlkalmazas {
         private void kuldEmailErtesitest(String etel, String ital, String idopont, String helyszin, String dressCode) {
             new Thread(() -> {
                 try {
-                    String uzenet = "Szia!\n\nUj randi meghivas lett elfogadva!\n\n" +
-                            "Etel: " + etel + "\n" +
-                            "Ital: " + ital + "\n" +
-                            "Idopont: " + idopont + "\n" +
-                            "Helyszin: " + helyszin + "\n" +
+                    String uzenet = "Szia! Uj randi meghivas lett elfogadva!\\n\\n" +
+                            "Etel: " + etel + "\\n" +
+                            "Ital: " + ital + "\\n" +
+                            "Idopont: " + idopont + "\\n" +
+                            "Helyszin: " + helyszin + "\\n" +
                             "Dress Code Tipp: " + dressCode;
 
-                    String postData = "access_key=" + WEB3FORMS_KEY +
-                            "&name=" + java.net.URLEncoder.encode("Randi Partner 😍", StandardCharsets.UTF_8) +
-                            "&email=" + java.net.URLEncoder.encode("randiapp@felho.hu", StandardCharsets.UTF_8) +
-                            "&subject=" + java.net.URLEncoder.encode("Uj Randi Foglalas! ❤️", StandardCharsets.UTF_8) +
-                            "&message=" + java.net.URLEncoder.encode(uzenet, StandardCharsets.UTF_8);
+                    // JSON formátumú kérés a Web3Forms felé
+                    String jsonPayload = "{"
+                            + "\"access_key\": \"" + WEB3FORMS_KEY + "\","
+                            + "\"subject\": \"Uj Randi Foglalas! ❤️\","
+                            + "\"from_name\": \"Randi App 😍\","
+                            + "\"message\": \"" + uzenet + "\""
+                            + "}";
 
                     java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
 
                     java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
-                            .uri(java.net.URI.create("[https://api.web3forms.com/submit](https://api.web3forms.com/submit)"))
-                            .header("Content-Type", "application/x-www-form-urlencoded")
-                            .POST(java.net.http.HttpRequest.BodyPublishers.ofString(postData))
+                            .uri(java.net.URI.create("https://api.web3forms.com/submit"))
+                            .header("Content-Type", "application/json")
+                            .header("Accept", "application/json")
+                            .POST(java.net.http.HttpRequest.BodyPublishers.ofString(jsonPayload, StandardCharsets.UTF_8))
                             .build();
 
                     java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());

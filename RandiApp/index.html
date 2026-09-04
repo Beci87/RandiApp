@@ -29,7 +29,6 @@
         nyersDatum: null
     };
 
-    // Helyszínek, keresési linkek és öltözködési tippek
     const helyszinek = {
         "Pizza 🍕": { nev: "La Terrazza étterem", kereses: "La Terrazza étterem Nyíregyháza", dressCode: "Laza, csinos outfit 🍕✨" },
         "Sushi 🍣": { nev: "Wok'n Go", kereses: "Wok n Go Nyíregyháza", dressCode: "Kényelmes, de stílusos viselet 🥢" },
@@ -175,7 +174,6 @@
             const parts = egyediDatum.split('-');
             targetDate = new Date(parts[0], parts[1] - 1, parts[2], parseInt(ora), parseInt(perc));
         } else {
-            // Fix opciók esetén kiszámítjuk a céldátumot
             let now = new Date();
             let dayOffset = 0;
             if (napSelect.includes("péntek")) {
@@ -210,7 +208,8 @@
             ajanlottDressCode = "Kényelmes, városi szett ✨";
         }
 
-        const terkepLink = "[https://www.google.com/maps/search/?api=1&query=](https://www.google.com/maps/search/?api=1&query=)" + encodeURIComponent(keresoKifejezes);
+        // BIZTOS GOOGLE MAPS LINK
+        const terkepLink = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(keresoKifejezes);
 
         const kuldesiBody = "etel=" + encodeURIComponent(valaszok.etel) +
                            "&ital=" + encodeURIComponent(valaszok.ital) +
