@@ -166,7 +166,7 @@ function finalizeRandi() {
         let veglegesHelyszin = "";
         let keresoKifejezes = "";
 
-        // Helyszín kiválasztásának javítása
+        // Helyszín kiválasztása
         if (valaszok.etel && valaszok.etel !== "Csak inni szeretnék 🥂" && helyszinek[valaszok.etel]) {
             veglegesHelyszin = helyszinek[valaszok.etel].nev;
             keresoKifejezes = helyszinek[valaszok.etel].kereses;
@@ -178,12 +178,13 @@ function finalizeRandi() {
             keresoKifejezes = "Nyíregyháza Kossuth tér";
         }
 
-        // URL-biztos Google Maps link generálása
         const terkepLink = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(keresoKifejezes);
 
+        // HOZZÁADVA: &helyszin= paraméter a kéréshez
         const kuldesiBody = "etel=" + encodeURIComponent(valaszok.etel) +
                            "&ital=" + encodeURIComponent(valaszok.ital) +
-                           "&idopont=" + encodeURIComponent(valaszok.datumIdo);
+                           "&idopont=" + encodeURIComponent(valaszok.datumIdo) +
+                           "&helyszin=" + encodeURIComponent(veglegesHelyszin);
 
         fetch('/mentes', {
             method: 'POST',

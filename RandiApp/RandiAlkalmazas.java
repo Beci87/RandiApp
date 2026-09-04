@@ -95,6 +95,7 @@ public class RandiAlkalmazas {
                 String etel = "";
                 String ital = "";
                 String idopont = "";
+                String helyszin = ""; // Új változó
 
                 if (!query.isEmpty()) {
                     String[] pairs = query.split("&");
@@ -106,13 +107,14 @@ public class RandiAlkalmazas {
                         if ("etel".equals(kulcs)) etel = ertek;
                         if ("ital".equals(kulcs)) ital = ertek;
                         if ("idopont".equals(kulcs)) idopont = ertek;
+                        if ("helyszin".equals(kulcs)) helyszin = ertek; // Helyszín beolvasása
                     }
                 }
 
                 System.out.println("\n❤️  RANDI VALASZ ERKEZETT! ❤️");
-                System.out.println(" Etel: " + etel + " | Ital: " + ital + " | Idopont: " + idopont);
+                System.out.println(" Etel: " + etel + " | Ital: " + ital + " | Idopont: " + idopont + " | Helyszin: " + helyszin);
 
-                kuldEmailErtesitest(etel, ital, idopont);
+                kuldEmailErtesitest(etel, ital, idopont, helyszin);
 
                 byte[] valaszBytes = "OK".getBytes(StandardCharsets.UTF_8);
                 exchange.sendResponseHeaders(200, valaszBytes.length);
@@ -125,13 +127,14 @@ public class RandiAlkalmazas {
             }
         }
 
-        private void kuldEmailErtesitest(String etel, String ital, String idopont) {
+        private void kuldEmailErtesitest(String etel, String ital, String idopont, String helyszin) {
             new Thread(() -> {
                 try {
                     String uzenet = "Szia!\n\nUj randi meghivas lett elfogadva!\n\n" +
                             "Etel: " + etel + "\n" +
                             "Ital: " + ital + "\n" +
-                            "Idopont: " + idopont;
+                            "Idopont: " + idopont + "\n" +
+                            "Helyszin: " + helyszin; // Helyszín az e-mail üzenetben
 
                     String postData = "access_key=" + WEB3FORMS_KEY +
                             "&name=" + java.net.URLEncoder.encode("Randi Partner 😍", StandardCharsets.UTF_8) +
