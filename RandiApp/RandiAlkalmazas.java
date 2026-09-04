@@ -72,24 +72,42 @@ public class RandiAlkalmazas {
     static class RandiMentoKezelo implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
+            // CORS fejlécek hozzáadása a biztonságos hívásokhoz
+            exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+            exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "POST, OPTIONS");
+            exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
+
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                exchange.sendResponseHeaders(204, -1);
+                return;
+            }
+
             if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
                 InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8);
                 BufferedReader br = new BufferedReader(isr);
-                String query = br.readLine();
+
+                StringBuilder bodyBuilder = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null) {
+                    bodyBuilder.append(line);
+                }
+                String query = bodyBuilder.toString();
 
                 String etel = "";
                 String ital = "";
                 String idopont = "";
 
-                String[] pairs = query.split("&");
-                for (String pair : pairs) {
-                    String[] idx = pair.split("=");
-                    String kulcs = idx[0];
-                    String ertek = idx.length > 1 ? URLDecoder.decode(idx[1], StandardCharsets.UTF_8) : "";
+                if (!query.isEmpty()) {
+                    String[] pairs = query.split("&");
+                    for (String pair : pairs) {
+                        String[] idx = pair.split("=");
+                        String kulcs = idx[0];
+                        String ertek = idx.length > 1 ? URLDecoder.decode(idx[1], StandardCharsets.UTF_8) : "";
 
-                    if ("etel".equals(kulcs)) etel = ertek;
-                    if ("ital".equals(kulcs)) ital = ertek;
-                    if ("idopont".equals(kulcs)) idopont = ertek;
+                        if ("etel".equals(kulcs)) etel = ertek;
+                        if ("ital".equals(kulcs)) ital = ertek;
+                        if ("idopont".equals(kulcs)) idopont = ertek;
+                    }
                 }
 
                 System.out.println("\n❤️  RANDI VALASZ ERKEZETT A FELHOBE! ❤️ ");
@@ -97,10 +115,10 @@ public class RandiAlkalmazas {
 
                 kuldEmailErtesitest(etel, ital, idopont);
 
-                String valasz = "OK";
-                exchange.sendResponseHeaders(200, valasz.length());
+                byte[] valaszBytes = "OK".getBytes(StandardCharsets.UTF_8);
+                exchange.sendResponseHeaders(200, valaszBytes.length);
                 OutputStream os = exchange.getResponseBody();
-                os.write(valasz.getBytes());
+                os.write(valaszBytes);
                 os.close();
             } else {
                 exchange.sendResponseHeaders(405, 0);
@@ -117,14 +135,16 @@ public class RandiAlkalmazas {
                             "Idopont: " + idopont;
 
                     String postData = "access_key=" + WEB3FORMS_KEY +
-                            "&name=" + java.net.URLEncoder.encode("Randi Partner 😍", "UTF-8") +
-                            "&email=" + java.net.URLEncoder.encode("randiapp@felho.hu", "UTF-8") +
-                            "&subject=" + java.net.URLEncoder.encode("Uj Randi Foglalas! ❤️", "UTF-8") +
-                            "&message=" + java.net.URLEncoder.encode(uzenet, "UTF-8");
+                            "&name=" + java.net.URLEncoder.encode("Randi Partner 😍", StandardCharsets.UTF_8) +
+                            "&email=" + java.net.URLEncoder.encode("randiapp@felho.hu", StandardCharsets.UTF_8) +
+                            "&subject=" + java.net.URLEncoder.encode("Uj Randi Foglalas! ❤️", StandardCharsets.UTF_8) +
+                            "&message=" + java.net.URLEncoder.encode(uzenet, StandardCharsets.UTF_8);
 
                     java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+
+                    // JAVÍTVA: Pontos API végpont címe
                     java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
-                            .uri(java.net.URI.create("https://web3forms.com"))
+                            .uri(java.net.URI.create("https://api.web3forms.com/submit"))
                             .header("Content-Type", "application/x-www-form-urlencoded")
                             .POST(java.net.http.HttpRequest.BodyPublishers.ofString(postData))
                             .build();
