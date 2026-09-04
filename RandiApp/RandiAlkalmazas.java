@@ -13,7 +13,7 @@ import java.nio.file.Files;
 public class RandiAlkalmazas {
 
     // 🚨 A TE SAJÁT WEB3FORMS KULCSOD 🚨
-    private static final String WEB3FORMS_KEY = "09be82c4-9d04-4e0d-b733-af3dd910c16b";
+    private static final String WEB3FORMS_KEY = "362b4fca-032a-4577-ab3b-a3b1b397796e";
 
     public static void main(String[] args) throws IOException {
         String portVar = System.getenv("PORT");
@@ -95,7 +95,6 @@ public class RandiAlkalmazas {
                 System.out.println("\n❤️  RANDI VALASZ ERKEZETT A FELHOBE! ❤️ ");
                 System.out.println(" Etel: " + etel + " | Ital: " + ital + " | Idopont: " + idopont);
 
-                // Itt inditjuk el az e-mail kuldest a hatterben
                 kuldEmailErtesitest(etel, ital, idopont);
 
                 String valasz = "OK";
@@ -109,8 +108,6 @@ public class RandiAlkalmazas {
             }
         }
 
-        // Felhőbiztos HTTPS e-mail küldő modul
-        // VÉGLEGES ÉS SPAMSZŰRŐ-BIZTOS E-MAIL KÜLDŐ
         private void kuldEmailErtesitest(String etel, String ital, String idopont) {
             new Thread(() -> {
                 try {
@@ -119,7 +116,6 @@ public class RandiAlkalmazas {
                             "Ital: " + ital + "\n" +
                             "Idopont: " + idopont;
 
-                    // Hozzáadtuk a name és email mezőket, hogy a Web3Forms spamszűrője átengedje!
                     String postData = "access_key=" + WEB3FORMS_KEY +
                             "&name=" + java.net.URLEncoder.encode("Randi Partner 😍", "UTF-8") +
                             "&email=" + java.net.URLEncoder.encode("randiapp@felho.hu", "UTF-8") +
@@ -128,7 +124,7 @@ public class RandiAlkalmazas {
 
                     java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
                     java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
-                            .uri(java.net.URI.create("https://api.web3forms.com/submit"))
+                            .uri(java.net.URI.create("https://web3forms.com"))
                             .header("Content-Type", "application/x-www-form-urlencoded")
                             .POST(java.net.http.HttpRequest.BodyPublishers.ofString(postData))
                             .build();
@@ -141,6 +137,5 @@ public class RandiAlkalmazas {
                 }
             }).start();
         }
-
     }
 }
