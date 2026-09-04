@@ -72,7 +72,6 @@ public class RandiAlkalmazas {
     static class RandiMentoKezelo implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            // CORS fejlécek hozzáadása a biztonságos hívásokhoz
             exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
             exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "POST, OPTIONS");
             exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
@@ -110,7 +109,7 @@ public class RandiAlkalmazas {
                     }
                 }
 
-                System.out.println("\n❤️  RANDI VALASZ ERKEZETT A FELHOBE! ❤️ ");
+                System.out.println("\n❤️  RANDI VALASZ ERKEZETT! ❤️");
                 System.out.println(" Etel: " + etel + " | Ital: " + ital + " | Idopont: " + idopont);
 
                 kuldEmailErtesitest(etel, ital, idopont);
@@ -142,7 +141,6 @@ public class RandiAlkalmazas {
 
                     java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
 
-                    // JAVÍTVA: Pontos API végpont címe
                     java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
                             .uri(java.net.URI.create("https://api.web3forms.com/submit"))
                             .header("Content-Type", "application/x-www-form-urlencoded")
@@ -150,7 +148,7 @@ public class RandiAlkalmazas {
                             .build();
 
                     java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
-                    System.out.println("E-mail szerver valasza a felhoben: " + response.body());
+                    System.out.println("E-mail szerver valasza: " + response.body());
 
                 } catch (Exception e) {
                     System.out.println("Hiba tortent az e-mail kuldese kozben: " + e.getMessage());
