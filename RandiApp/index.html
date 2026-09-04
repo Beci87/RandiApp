@@ -29,15 +29,15 @@
     };
 
     // Helyszínek és pontos Google Térkép linkek
-    const helyszinek = {
-        "Pizza 🍕": { nev: "La Terrazza étterem", link: "https://www.google.com/maps/search/?api=1&query=La+Terrazza+étterem+Nyíregyháza" },
-        "Sushi 🍣": { nev: "Wok'n Go", link: "https://www.google.com/maps/search/?api=1&query=Wok+n+Go+Nyíregyháza" },
-        "Burger 🍔": { nev: "Simon's Burger (Pláza/Korzó)", link: "https://www.google.com/maps/search/?api=1&query=Simons+Burger+Nyíregyháza" },
-        "Desszert 🍰": { nev: "Stühmer cukrászda", link: "https://www.google.com/maps/search/?api=1&query=Stühmer+Cukrászda+Nyíregyháza" },
-        "Bor 🍷": { nev: "Continent Wine&Cafe", link: "https://www.google.com/maps/search/?api=1&query=Continent+Wine+and+Coffee+Nyíregyháza" },
-        "Koktél 🍹": { nev: "Hedonist étterem", link: "https://www.google.com/maps/search/?api=1&query=Hedonist+Restaurant+Nyíregyháza" },
-        "Sör 🍺": { nev: "Gedeon söröző", link: "https://www.google.com/maps/search/?api=1&query=Gedeon+Nyíregyháza" },
-        "Kávé/Tea ☕": { nev: "Cafe Frei", link: "https://www.google.com/maps/search/?api=1&query=Cafe+Frei+Nyíregyháza" }
+ const helyszinek = {
+        "Pizza 🍕": { nev: "La Terrazza étterem", kereses: "La Terrazza étterem Nyíregyháza" },
+        "Sushi 🍣": { nev: "Wok'n Go", kereses: "Wok n Go Nyíregyháza" },
+        "Burger 🍔": { nev: "Simon's Burger (Pláza/Korzó)", kereses: "Simons Burger Nyíregyháza" },
+        "Desszert 🍰": { nev: "Stühmer cukrászda", kereses: "Stühmer Cukrászda Nyíregyháza" },
+        "Bor 🍷": { nev: "Continent Wine&Cafe", kereses: "Continent Wine and Coffee Nyíregyháza" },
+        "Koktél 🍹": { nev: "Hedonist étterem", kereses: "Hedonist Restaurant Nyíregyháza" },
+        "Sör 🍺": { nev: "Gedeon söröző", kereses: "Gedeon Nyíregyháza" },
+        "Kávé/Tea ☕": { nev: "Cafe Frei", kereses: "Cafe Frei Nyíregyháza" }
     };
 
     function escapeButton() {
@@ -146,7 +146,7 @@
     }
 
     // VÉGSŐ LOGIKA ÉS KÜLDÉS
-    function finalizeRandi() {
+function finalizeRandi() {
         const nap = document.getElementById('dateSelect').value;
         const ora = document.getElementById('hourInput').value;
         const perc = document.getElementById('minuteInput').value;
@@ -164,15 +164,22 @@
         valaszok.datumIdo = veglegesNap + " " + ora + perc;
 
         let veglegesHelyszin = "";
-        let terkepLink = "";
+        let keresoKifejezes = "";
 
-        if (valaszok.etel === "Csak inni szeretnék 🥂") {
-            veglegesHelyszin = helyszinek[valaszok.ital].nev;
-            terkepLink = helyszinek[valaszok.ital].link;
-        } else {
+        // Helyszín kiválasztásának javítása
+        if (valaszok.etel && valaszok.etel !== "Csak inni szeretnék 🥂" && helyszinek[valaszok.etel]) {
             veglegesHelyszin = helyszinek[valaszok.etel].nev;
-            terkepLink = helyszinek[valaszok.etel].link;
+            keresoKifejezes = helyszinek[valaszok.etel].kereses;
+        } else if (valaszok.ital && helyszinek[valaszok.ital]) {
+            veglegesHelyszin = helyszinek[valaszok.ital].nev;
+            keresoKifejezes = helyszinek[valaszok.ital].kereses;
+        } else {
+            veglegesHelyszin = "Belvárosi találkozó pont";
+            keresoKifejezes = "Nyíregyháza Kossuth tér";
         }
+
+        // URL-biztos Google Maps link generálása
+        const terkepLink = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(keresoKifejezes);
 
         const kuldesiBody = "etel=" + encodeURIComponent(valaszok.etel) +
                            "&ital=" + encodeURIComponent(valaszok.ital) +
